@@ -44,7 +44,7 @@ class _TechBlogState extends State<TechBlog> {
       throw Exception('Failed to fetch atom.xml');
     }
 
-    // debugPrint(utf8.decode(response.bodyBytes))
+    // debugPrint(utf8.decode(response.bodyBytes));
     final atomFeed = AtomFeed.parse(utf8.decode(response.bodyBytes));
     atomFeed.items.forEach((item) => {_articles.add(item)});
   }
@@ -58,10 +58,21 @@ class _TechBlogState extends State<TechBlog> {
       body: ListView.builder(
         itemCount: _articles.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            leading: Text(_articles[index].published.toString()),
-            title: Text(_articles[index].title.toString()),
-            onTap: () => {_launchURL(_articles[index].id.toString())},
+          final item = _articles[index];
+          return Dismissible(
+            key: Key(item.title.toString()),
+            onDismissed: (direction) {
+              setState(() {
+                _articles.removeAt(index);
+              });
+            },
+            background: Container(color: Colors.red),
+            secondaryBackground: Container(color: Colors.blue),
+            child: ListTile(
+              leading: Text(item.published.toString()),
+              title: Text(item.title.toString()),
+              onTap: () => {_launchURL(item.id.toString())},
+            ),
           );
         },
       ),
